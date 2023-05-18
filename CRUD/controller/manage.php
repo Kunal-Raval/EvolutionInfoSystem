@@ -4,9 +4,7 @@ require("db.php");
 $pid = "";
 if (isset($_GET['did'])) {
     $pid = $_GET['did'];
-
     $conn->query("UPDATE product_details SET p_status = 1 WHERE pid = '$pid'");
-
     header('location: ../product.php');
 }
 
@@ -21,12 +19,23 @@ if (isset($_GET['uid'])) {
 <head>
     <title>Update Product</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+    .error {
+        color: red;
+        font-weight: bold;
+    }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+    <script src="../js/validation.js"></script>
+
+
 </head>
 
 <body>
     <div class="container">
         <h1>Update Product</h1>
-        <form method="post" action="update.php">
+        <form id="myForm" method="post" action="update.php" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="pname">Product Name:</label>
                 <input type="text" class="form-control" placeholder="Enter Product Name" id="pname" name="pname"
@@ -49,8 +58,16 @@ if (isset($_GET['uid'])) {
             </div>
             <div class="form-group">
                 <label for="quantity">Product Quantity:</label>
-                <input type="number" class="form-control" placeholder="Enter Product Quantity" id="quantity"
+                <input type="text" class="form-control" placeholder="Enter Product Quantity" id="quantity"
                     name="quantity" value="<?php echo $row['p_quantity']; ?>" required>
+            </div>
+            <div class="form-group">
+                <img src="<?php echo "../" . $row['img']; ?>" width="250">
+            </div>
+            <div class="form-group">
+                <label for="category_name">Upload or Change Image:</label>
+
+                <input type="file" name="fileToUpload" id="fileToUpload">
             </div>
             <div class="form-group">
                 <button type="submit" name="update" class="btn btn-primary">Update</button>
@@ -61,5 +78,7 @@ if (isset($_GET['uid'])) {
 
 </html>
 <?php
+} else {
+    header('location: ../product.php');
 }
 ?>

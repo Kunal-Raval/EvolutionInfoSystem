@@ -14,90 +14,94 @@ $categoriesList = "";
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <style>
-    table,
-    th,
-    td {
-        text-align: center;
-    }
+        table,
+        th,
+        td {
+            text-align: center;
+
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
     </style>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script>
-    $(document).ready(function() {
-        $("#view_products").click(function() {
-            $("#add_products").hide();
-        });
-        $("#view_products").click(function() {
-            $("#product_list").show();
-        });
-    });
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js">
     </script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+
+    <script src="js/validation.js"></script>
+    <script src="js/viewProduct.js"></script>
+
 </head>
 
 <body>
-    <div class="container" id="add_products">
-        <h1>Add Products</h1>
-        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>"
-            enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="category_name">Select Category:</label>
 
-                <select id="categories" name="cid">
-                    <?php
-                    foreach ($conn->query("SELECT cid, c_name FROM category WHERE `status` = 0") as $row) {
+    <div class="container">
+        <div id="add_products">
+            <h1>Add Products</h1>
+            <form id="myForm" method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>"
+                enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="category_name">Select Category:</label>
+
+                    <select id="categories" name="cid">
+                        <?php
+                        foreach ($conn->query("SELECT cid, c_name FROM category WHERE `status` = 0") as $row) {
+                            ?>
+                            <option value="<?php echo $row["cid"]; ?>"><?php echo $row["c_name"]; ?></option>
+                            <?php
+                        }
                         ?>
-                    <option value="<?php echo $row["cid"]; ?>"><?php echo $row["c_name"]; ?></option>
-                    <?php
-                    }
-                    ?>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="category_name">Product Name:</label>
-                <input type="text" class="form-control" placeholder="Enter Product Name" id="pname" name="pname"
-                    required>
-            </div>
-            <div class="form-group">
-                <label for="category_name">Product SKU:</label>
-                <input type="text" class="form-control" placeholder="Enter Product's SKU" id="sku" name="sku" required>
-            </div>
-            <div class="form-group">
-                <label for="category_name">Product Details:</label>
-                <textarea class="form-control" placeholder="Enter Product details" id="details" name="details" rows="4"
-                    required></textarea>
-            </div>
-            <div class="form-group">
-                <label for="category_name">Product Price:</label>
-                <input type="text" class="form-control" placeholder="Enter Product Price" id="price" name="price"
-                    required>
-            </div>
-            <div class="form-group">
-                <label for="category_name">Product Quantity:</label>
-                <input type="text" class="form-control" placeholder="Enter Quantity" id="quantity" name="quantity"
-                    required>
-            </div>
-            <div class="form-group">
-                <label for="category_name">Upload Image:</label>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="category_name">Product Name:</label>
+                    <input type="text" class="form-control" placeholder="Enter Product Name" id="pname" name="pname"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="category_name">Product SKU:</label>
+                    <input type="text" class="form-control" placeholder="Enter Product's SKU" id="sku" name="sku"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="category_name">Product Details:</label>
+                    <textarea class="form-control" placeholder="Enter Product details" id="details" name="details"
+                        rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="category_name">Product Price:</label>
+                    <input type="text" class="form-control" placeholder="Enter Product Price" id="price" name="price"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="category_name">Product Quantity:</label>
+                    <input type="text" class="form-control" placeholder="Enter Quantity" id="quantity" name="quantity"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="category_name">Upload Image:</label>
 
-                <input type="file" name="fileToUpload" id="fileToUpload" required>
-            </div>
-            <div class="form-group">
-                <button type="submit" name="submit" class="btn btn-primary">Add Product</button>
-            </div>
-        </form>
-        <div class="form-group">
-            <button type="submit" id="view_products" class="btn btn-primary">View Products</button>
+                    <input type="file" name="fileToUpload" id="fileToUpload">
+                </div>
+                <div class="form-group">
+                    <button type="submit" name="submit" class="btn btn-primary">Add Product</button>
+                </div>
+            </form>
+
         </div>
-    </div>
+
 </body>
 
 </html>
 
 <?php
 
-$cid = $pname = $sku = $details = $price = $quantity = "";
+$cid = $pname = $sku = $details = $price = $quantity = $imagePath = "";
 
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["fileToUpload"]) && $_FILES["fileToUpload"]["error"] == UPLOAD_ERR_OK) {
+if ($_SERVER["REQUEST_METHOD"] == "POST" or (isset($_FILES["fileToUpload"]) and $_FILES["fileToUpload"]["error"] == UPLOAD_ERR_OK)) {
 
     $cid = test_input($_POST["cid"]);
     $pname = test_input($_POST["pname"]);
@@ -134,9 +138,11 @@ function test_input($data)
 }
 ?>
 
-<div id="product_list" style="display:none;">
+<!-- VIEW PRODUCT LIST -->
+<div class="container">
+    <div id="product_list" style="display:none;">
 
-    <div class="container">
+
         <h1>List Of Products</h1>
         <table class="table">
             <thead>
@@ -156,50 +162,88 @@ function test_input($data)
             <tbody>
                 <?php
                 $j = 1;
-                foreach ($conn->query("SELECT product_details.*, category.c_name as cname FROM product_details
-                                LEFT JOIN category ON product_details.cid = category.cid
-                            WHERE product_details.p_status = 0") as $pList) {
+                $pageSize = 5;
+                $currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
+                $temp = ($currentPage - 1) * $pageSize;
+
+                $sql = $conn->query("SELECT product_details.*, category.c_name as cname FROM product_details
+                                        LEFT JOIN category ON product_details.cid = category.cid
+                                        WHERE product_details.p_status = 0 LIMIT " . $temp . "," . $pageSize);
+                $productsCount = [];
+
+                if ($sql->num_rows > 0) {
+                    while ($data = $sql->fetch_assoc()) {
+                        $productsCount[] = $data;
+                    }
+                }
+
+                $j = $temp + 1;
+                foreach ($productsCount as $pList) {
+
                     ?>
-                <tr>
-                    <td>
-                        <?php echo $j ?>
-                    </td>
-                    <td>
-                        <?php echo $pList['cname'] ?>
-                    </td>
-                    <td>
-                        <?php echo $pList['p_name'] ?>
-                    </td>
-                    <td>
-                        <?php echo $pList['p_details'] ?>
-                    </td>
-                    <td>
-                        <?php echo $pList['p_sku'] ?>
-                    </td>
-                    <td>
-                        <embed src="<?php $pList['img'] ?>" />
-                    </td>
-                    <td>
-                        <?php echo $pList['p_price'] ?>
-                    </td>
-                    <td>
-                        <?php echo $pList['p_quantity'] ?>
-                    </td>
-                    <td>
-                        <a href="./controller/manage.php?uid=<?php echo $pList['pid'] ?>">
-                            <button id="update" class="btn btn-primary">UPDATE</button></a>
-                    </td>
-                    <td>
-                        <a href="./controller/manage.php?did=<?php echo $pList['pid'] ?>">
-                            <button class="btn btn-primary">DELETE</button></a>
-                    </td>
-                </tr>
-                <?php
+                    <tr>
+                        <td>
+                            <?php echo $j ?>
+                        </td>
+                        <td>
+                            <?php echo $pList['cname'] ?>
+                        </td>
+                        <td>
+                            <?php echo $pList['p_name'] ?>
+                        </td>
+                        <td>
+                            <?php echo $pList['p_details'] ?>
+                        </td>
+                        <td>
+                            <?php echo $pList['p_sku'] ?>
+                        </td>
+                        <td>
+                            <img src="<?php echo "./" . $pList['img'] ?>" width="100" alt="<?php echo $pList['img'] ?>">
+                        </td>
+                        <td>
+                            <?php echo $pList['p_price'] ?>
+                        </td>
+                        <td>
+                            <?php echo $pList['p_quantity'] ?>
+                        </td>
+                        <td>
+                            <a href="./controller/manage.php?uid=<?php echo $pList['pid'] ?>">
+                                <button id="update" class="btn btn-primary">UPDATE</button></a>
+                        </td>
+                        <td>
+                            <a href="./controller/manage.php?did=<?php echo $pList['pid'] ?>">
+                                <button id="delete" class="btn btn-primary">DELETE</button></a>
+                        </td>
+                    </tr>
+                    <?php
                     $j++;
 
                 }
                 ?>
             </tbody>
         </table>
+        <nav>
+            <ul class="pagination justify-content-center">
+                <?php
+
+
+                $countResult = $conn->query("SELECT COUNT(*) FROM product_details WHERE p_status = 0");
+                $totalRecords = $countResult->fetch_row()[0];
+
+                $totalPages = ceil($totalRecords / $pageSize);
+
+                for ($i = 1; $i <= $totalPages; $i++) {
+                    ?>
+                    <li class="page-item <?php echo ($i == $currentPage) ? 'active' : ''; ?>">
+                        <a id="pagination" class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                    </li>
+                    <?php
+                }
+                ?>
+            </ul>
+        </nav>
+    </div>
+    <div class="form-group">
+        <button id="view_products" class="btn btn-primary">View Products</button>
     </div>
 </div>
