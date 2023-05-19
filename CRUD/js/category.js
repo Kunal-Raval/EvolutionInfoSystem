@@ -9,13 +9,11 @@ $(document).ready(function() {
                 required: true,
                 noSpecialChars: true
             }
-
         },
         messages: {
             category_name: {
                 required: "Enter a valid Category name. No special characters allowed."
             }
-
         },
         errorClass: "error",
         submitHandler: function(form) {
